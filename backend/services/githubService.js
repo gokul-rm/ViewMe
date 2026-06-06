@@ -42,6 +42,17 @@ const findRepositoryByUrl = (repoUrl, callback) => {
     );
 };
 
+const getReadme = async (owner, repo) => {
+  const response = await axios.get(
+    `https://api.github.com/repos/${owner}/${repo}/readme`
+  );
+
+  return Buffer.from(
+    response.data.content,
+    "base64"
+  ).toString("utf-8");
+};
+
 const getContributors = async (owner, repo) => {
 
     const response = await axios.get(
@@ -55,6 +66,23 @@ const getIssues = async (owner, repo) => {
 
     const response = await axios.get(
         `https://api.github.com/repos/${owner}/${repo}/issues`
+    );
+
+    return response.data;
+};
+const getCommits = async (owner, repo) => {
+
+    const response = await axios.get(
+        `https://api.github.com/repos/${owner}/${repo}/commits`
+    );
+
+    return response.data;
+};
+
+const getLanguages = async (owner, repo) => {
+
+    const response = await axios.get(
+        `https://api.github.com/repos/${owner}/${repo}/languages`
     );
 
     return response.data;
@@ -105,5 +133,8 @@ module.exports = {
     getContributors,
     getIssues,
     getAllRepositories,
-    getDashboardData
+    getDashboardData,
+    getLanguages,
+    getReadme,
+    getCommits
 };

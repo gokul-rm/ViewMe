@@ -7,7 +7,7 @@ const analyzeRepository = async (req, res) => {
     const parts = repoUrl.split("/");
 
     const owner = parts[3];
-    const repo = parts[4];
+    const repo = parts[4].replace(".git", "");
 
     try {
 
@@ -18,13 +18,16 @@ const analyzeRepository = async (req, res) => {
 
 
 
+
         const repositoryData = {
             name: data.name,
             owner: data.owner.login,
+            avatar: data.owner.avatar_url,
             repo_url: repoUrl,
             stars: data.stargazers_count,
             language: data.language,
             description: data.description,
+            license: data.license?.name || "No License",
             topics: data.topics,
             createdAt: data.created_at,
 updatedAt: data.updated_at,
@@ -48,6 +51,7 @@ updatedAt: data.updated_at,
     return res.json({
     ...results[0],
     description: data.description,
+    license: data.license?.name || "No License",
     topics: data.topics,
     createdAt: data.created_at,
 updatedAt: data.updated_at,
@@ -134,6 +138,59 @@ const getIssues = async (req, res) => {
     }
 };
 
+const getCommits = async (req, res) => {
+
+    const { owner, repo } = req.params;
+
+    try {
+
+        const commits =
+            await githubService.getCommits(
+                owner,
+                repo
+            );
+
+        const simplifiedCommits =
+            commits.slice(0, 10).map((commit) => ({
+                message: commit.commit.message,
+                author: commit.commit.author.name,
+                date: commit.commit.author.date
+            }));
+
+        res.json(simplifiedCommits);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: "Failed to fetch commits"
+        });
+
+    }
+};
+
+const getLanguages = async (req, res) => {
+
+    const { owner, repo } = req.params;
+
+    try {
+
+        const languages =
+            await githubService.getLanguages(
+                owner,
+                repo
+            );
+
+        res.json(languages);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: "Failed to fetch languages"
+        });
+
+    }
+};
+
 const getAllRepositories = (req, res) => {
 
     githubService.getAllRepositories(
@@ -180,10 +237,30 @@ const getRepositoryDetails = async (req, res) => {
     }
 };
 
+const getReadme = async (req, res) => {
+  const { owner, repo } = req.params;
+
+  try {
+    const readme = await githubService.getReadme(
+      owner,
+      repo
+    );
+
+    res.json({ readme });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch README"
+    });
+  }
+};
+
 module.exports = {
     analyzeRepository,
     getContributors,
     getRepositoryDetails,
     getIssues,
-    getAllRepositories
+    getAllRepositories,
+    getLanguages,
+    getReadme,
+    getCommits
 };  
