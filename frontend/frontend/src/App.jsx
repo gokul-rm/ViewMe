@@ -99,8 +99,42 @@ function App() {
             </div>
 
             {repository.description && (
+              
   <div className="mb-4 bg-gray-100 p-4 rounded-lg">
     <p>{repository.description}</p>
+  </div>
+)}
+<div className="grid grid-cols-2 gap-4 mb-4">
+  <div className="bg-gray-100 p-3 rounded-lg">
+    <p className="text-sm text-gray-500">
+      Created
+    </p>
+
+    <p className="font-semibold">
+      {new Date(repository.createdAt).toLocaleDateString()}
+    </p>
+  </div>
+
+  <div className="bg-gray-100 p-3 rounded-lg">
+    <p className="text-sm text-gray-500">
+      Last Updated
+    </p>
+
+    <p className="font-semibold">
+      {new Date(repository.updatedAt).toLocaleDateString()}
+    </p>
+  </div>
+</div>
+{repository.topics && repository.topics.length > 0 && (
+  <div className="flex flex-wrap gap-2 mb-4">
+    {repository.topics.map((topic) => (
+      <span
+        key={topic}
+        className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm"
+      >
+        {topic}
+      </span>
+    ))}
   </div>
 )}
             <div className="grid grid-cols-2 md:grid-cols-6 gap-4">

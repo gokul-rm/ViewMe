@@ -25,6 +25,9 @@ const analyzeRepository = async (req, res) => {
             stars: data.stargazers_count,
             language: data.language,
             description: data.description,
+            topics: data.topics,
+            createdAt: data.created_at,
+updatedAt: data.updated_at,
             forks: data.forks_count,
             watchers: data.watchers_count,
             openIssues: data.open_issues_count
@@ -43,12 +46,15 @@ const analyzeRepository = async (req, res) => {
 
                 if (results.length > 0) {
     return res.json({
-        ...results[0],
-        description: data.description,
-        forks: data.forks_count,
-        watchers: data.watchers_count,
-        openIssues: data.open_issues_count
-    });
+    ...results[0],
+    description: data.description,
+    topics: data.topics,
+    createdAt: data.created_at,
+updatedAt: data.updated_at,
+    forks: data.forks_count,
+    watchers: data.watchers_count,
+    openIssues: data.open_issues_count
+});
 }
 
                 githubService.saveRepository(
