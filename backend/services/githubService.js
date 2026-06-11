@@ -1,13 +1,24 @@
 const axios = require("axios");
+const headers = {
+  Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+};
 const db = require("../config/db");
 
 const getRepositoryInfo = async (owner, repo) => {
 
     const response = await axios.get(
-        `https://api.github.com/repos/${owner}/${repo}`
+        `https://api.github.com/repos/${owner}/${repo}`, { headers }
     );
 
     return response.data;
+};
+
+const getUserProfile = async (username) => {
+  const response = await axios.get(
+    `https://api.github.com/users/${username}`, { headers }
+  );
+
+  return response.data;
 };
 
 const saveRepository = (repoData) => {
@@ -44,7 +55,7 @@ const findRepositoryByUrl = (repoUrl, callback) => {
 
 const getReadme = async (owner, repo) => {
   const response = await axios.get(
-    `https://api.github.com/repos/${owner}/${repo}/readme`
+    `https://api.github.com/repos/${owner}/${repo}/readme`, { headers }
   );
 
   return Buffer.from(
@@ -56,7 +67,7 @@ const getReadme = async (owner, repo) => {
 const getContributors = async (owner, repo) => {
 
     const response = await axios.get(
-        `https://api.github.com/repos/${owner}/${repo}/contributors`
+        `https://api.github.com/repos/${owner}/${repo}/contributors`, { headers }
     );
 
     return response.data;
@@ -65,7 +76,7 @@ const getContributors = async (owner, repo) => {
 const getIssues = async (owner, repo) => {
 
     const response = await axios.get(
-        `https://api.github.com/repos/${owner}/${repo}/issues`
+        `https://api.github.com/repos/${owner}/${repo}/issues`,{ headers }
     );
 
     return response.data;
@@ -73,7 +84,7 @@ const getIssues = async (owner, repo) => {
 const getCommits = async (owner, repo) => {
 
     const response = await axios.get(
-        `https://api.github.com/repos/${owner}/${repo}/commits`
+        `https://api.github.com/repos/${owner}/${repo}/commits`,{ headers }
     );
 
     return response.data;
@@ -82,7 +93,7 @@ const getCommits = async (owner, repo) => {
 const getLanguages = async (owner, repo) => {
 
     const response = await axios.get(
-        `https://api.github.com/repos/${owner}/${repo}/languages`
+        `https://api.github.com/repos/${owner}/${repo}/languages`, { headers }
     );
 
     return response.data;
@@ -126,15 +137,66 @@ const getDashboardData = async (
     };
 };
 
+const getBranches = async (owner, repo) => {
+  const response = await axios.get(
+    `https://api.github.com/repos/${owner}/${repo}/branches`,
+    { headers }
+  );
+
+  return response.data;
+};
+
+const compareRepositories = async (req, res) => {
+  const { owner1, repo1, owner2, repo2 } = req.params;
+
+  try {
+    const repoA = await githubService.getRepositoryInfo(
+      owner1,
+      repo1
+    );
+
+    const repoB = await githubService.getRepositoryInfo(
+      owner2,
+      repo2
+    );
+
+    res.json({
+      repoA: {
+        name: repoA.name,
+        stars: repoA.stargazers_count,
+        forks: repoA.forks_count,
+        issues: repoA.open_issues_count,
+        watchers: repoA.watchers_count,
+        language: repoA.language,
+      },
+      repoB: {
+        name: repoB.name,
+        stars: repoB.stargazers_count,
+        forks: repoB.forks_count,
+        issues: repoB.open_issues_count,
+        watchers: repoB.watchers_count,
+        language: repoB.language,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to compare repositories",
+    });
+  }
+};
+
 module.exports = {
     getRepositoryInfo,
     saveRepository,
+    compareRepositories,
+    getUserProfile,
     findRepositoryByUrl,
     getContributors,
     getIssues,
     getAllRepositories,
     getDashboardData,
     getLanguages,
+    getBranches,
     getReadme,
     getCommits
 };

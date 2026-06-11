@@ -16,7 +16,7 @@ const analyzeRepository = async (req, res) => {
             repo
         );
 
-
+        
 
 
         const repositoryData = {
@@ -78,6 +78,32 @@ updatedAt: data.updated_at,
         });
 
     }
+};
+
+const getUserProfile = async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const profile =
+      await githubService.getUserProfile(
+        username
+      );
+
+    res.json({
+      name: profile.name,
+      bio: profile.bio,
+      followers: profile.followers,
+      following: profile.following,
+      publicRepos: profile.public_repos,
+      location: profile.location,
+      avatar: profile.avatar_url,
+      profileUrl: profile.html_url
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch profile"
+    });
+  }
 };
 
 const getContributors = async (req, res) => {
@@ -237,6 +263,48 @@ const getRepositoryDetails = async (req, res) => {
     }
 };
 
+const getRecommendations = async (req, res) => {
+  const { language } = req.params;
+
+  const recommendations = {
+    JavaScript: [
+      "vercel/next.js",
+      "vuejs/vue",
+      "expressjs/express",
+      "sveltejs/svelte",
+      "preactjs/preact"
+    ],
+
+    TypeScript: [
+      "nestjs/nest",
+      "microsoft/vscode",
+      "angular/angular",
+      "supabase/supabase",
+      "remix-run/remix"
+    ],
+
+    Python: [
+      "django/django",
+      "pallets/flask",
+      "tensorflow/tensorflow",
+      "fastapi/fastapi",
+      "pytorch/pytorch"
+    ],
+
+    Java: [
+      "spring-projects/spring-boot",
+      "elastic/elasticsearch",
+      "apache/kafka",
+      "quarkusio/quarkus",
+      "hibernate/hibernate-orm"
+    ]
+  };
+
+  res.json(
+    recommendations[language] || []
+  );
+};
+
 const getReadme = async (req, res) => {
   const { owner, repo } = req.params;
 
@@ -254,13 +322,78 @@ const getReadme = async (req, res) => {
   }
 };
 
+const compareRepositories = async (req, res) => {
+  const { owner1, repo1, owner2, repo2 } = req.params;
+
+  try {
+    const repoA = await githubService.getRepositoryInfo(
+      owner1,
+      repo1
+    );
+
+    const repoB = await githubService.getRepositoryInfo(
+      owner2,
+      repo2
+    );
+
+    res.json({
+      repoA: {
+        name: repoA.name,
+        stars: repoA.stargazers_count,
+        forks: repoA.forks_count,
+        issues: repoA.open_issues_count,
+        watchers: repoA.watchers_count,
+        language: repoA.language,
+      },
+      repoB: {
+        name: repoB.name,
+        stars: repoB.stargazers_count,
+        forks: repoB.forks_count,
+        issues: repoB.open_issues_count,
+        watchers: repoB.watchers_count,
+        language: repoB.language,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to compare repositories",
+    });
+  }
+};
+
+const getBranches = async (req, res) => {
+  const { owner, repo } = req.params;
+
+  try {
+    const branches =
+      await githubService.getBranches(
+        owner,
+        repo
+      );
+
+    const simplifiedBranches =
+      branches.map((branch) => ({
+        name: branch.name
+      }));
+
+    res.json(simplifiedBranches);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch branches"
+    });
+  }
+};
+
 module.exports = {
-    analyzeRepository,
-    getContributors,
-    getRepositoryDetails,
-    getIssues,
-    getAllRepositories,
-    getLanguages,
-    getReadme,
-    getCommits
-};  
+  analyzeRepository,
+  getContributors,
+  getRepositoryDetails,
+  getIssues,
+  getAllRepositories,
+  getUserProfile,
+  getLanguages,
+  getReadme,
+  getCommits,
+  getBranches,
+  compareRepositories
+};

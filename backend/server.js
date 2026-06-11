@@ -6,11 +6,17 @@ const app = express();
 const db = require("./config/db");
 const repositoryRoutes = require("./routes/repositoryRoutes");
 const githubRoutes = require("./routes/githubRoutes");
+const chatRoutes =
+  require("./routes/chatRoutes");
 
 app.use(cors());
 app.use(express.json());
 app.use("/api/repositories", repositoryRoutes);
 app.use("/api/github", githubRoutes);
+app.use(
+  "/api/chat",
+  chatRoutes
+);
 
 app.get("/", (req, res) => {
     res.json({

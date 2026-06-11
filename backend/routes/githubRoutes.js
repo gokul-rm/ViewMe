@@ -46,4 +46,19 @@ router.get(
     githubController.getAllRepositories
 );
 
+router.get(
+  "/profile/:username",
+  githubController.getUserProfile
+);
+
+router.get(
+  "/compare/:owner1/:repo1/:owner2/:repo2",
+  githubController.compareRepositories
+);
+
+router.get(
+  "/branches/:owner/:repo",
+  githubController.getBranches
+);  
+
 module.exports = router;
