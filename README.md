@@ -1,6 +1,6 @@
-# CodeAtlas
+# ViewMe
 
-CodeAtlas is a full-stack GitHub repository analysis platform that allows users to analyze GitHub repositories and view repository statistics, contributors, issues, and repository history.
+ViewMe is a full-stack GitHub repository analysis platform that allows users to analyze GitHub repositories and view repository statistics, contributors, issues, and repository history.
 
 ## Features
 
