@@ -384,9 +384,61 @@ const getBranches = async (req, res) => {
   }
 };
 
+const getRepoTree = async (req, res) => {
+  const { owner, repo } = req.params;
+
+  try {
+    const tree =
+      await githubService.getRepoTree(
+        owner,
+        repo
+      );
+
+    const files = tree
+      .filter(item => item.type === "blob")
+      .slice(0, 200);
+
+    res.json(files);
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch repository tree"
+    });
+  }
+};
+
+const getFileContent = async (req, res) => {
+  const { owner, repo } = req.params;
+  const { path } = req.query;
+
+  try {
+    const content =
+      await githubService.getFileContent(
+        owner,
+        repo,
+        path
+      );
+
+    res.json({
+      path,
+      content
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch file content"
+    });
+  }
+};
+
 module.exports = {
   analyzeRepository,
   getContributors,
+  getFileContent,
   getRepositoryDetails,
   getIssues,
   getAllRepositories,
@@ -395,5 +447,6 @@ module.exports = {
   getReadme,
   getCommits,
   getBranches,
+  getRepoTree,
   compareRepositories
 };

@@ -42,6 +42,16 @@ router.get(
 );  
 
 router.get(
+  "/tree/:owner/:repo",
+  githubController.getRepoTree
+);
+
+router.get(
+  "/file/:owner/:repo",
+  githubController.getFileContent
+);
+
+router.get(
     "/repositories",
     githubController.getAllRepositories
 );

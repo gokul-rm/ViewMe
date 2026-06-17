@@ -20,6 +20,9 @@ function App() {
   const [contributors, setContributors] = useState([]);
   const [issues, setIssues] = useState([]);
   const [commits, setCommits] = useState([]);
+  const [files, setFiles] = useState([]);
+const [selectedFile, setSelectedFile] = useState("");
+const [fileContent, setFileContent] = useState("");
   const [readme, setReadme] = useState("");
   const [history, setHistory] = useState([]);
   const [branches, setBranches] = useState([]);
@@ -61,6 +64,11 @@ const [answer, setAnswer] = useState("");
     );
 
     setRepository(response.data);
+
+    await loadRepositoryTree(
+  response.data.owner,
+  response.data.name
+);
 
     const contributorsResponse = await axios.get(
       `http://localhost:5000/api/github/contributors/${response.data.owner}/${response.data.name}`
@@ -303,6 +311,46 @@ Health Score: ${calculateHealthScore()}/100
   }
 };
 
+
+
+const loadRepositoryTree = async (
+  owner,
+  repo
+) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:5000/api/github/tree/${owner}/${repo}`
+    );
+
+    setFiles(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const loadFileContent = async (
+  owner,
+  repo,
+  path
+) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:5000/api/github/file/${owner}/${repo}`,
+      {
+        params: { path }
+      }
+    );
+
+    setSelectedFile(path);
+    setFileContent(
+      response.data.content
+    );
+
+  } catch (error) {
+    console.error(error);
+  }
+};      
+
   const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444", "#06B6D4", "#EC4899", "#14B8A6"];
 
   // Custom tooltip to show percentage
@@ -322,6 +370,7 @@ Health Score: ${calculateHealthScore()}/100
     }
     return null;
   };
+  
 
   return (
     <div
@@ -710,6 +759,52 @@ Health Score: ${calculateHealthScore()}/100
             </div>
           </div>
         )}
+
+        <div className="mt-10">
+  <h3 className="text-xl font-bold mb-3">
+    Repository Files
+  </h3>
+
+  <div
+    className={`p-4 rounded-lg max-h-80 overflow-auto ${
+      darkMode ? "bg-gray-700" : "bg-gray-100"
+    }`}
+  >
+    {files.slice(0, 100).map((file, index) => (
+      <div
+        key={index}
+        onClick={() =>
+          loadFileContent(
+            repository.owner,
+            repository.name,
+            file.path
+          )
+        }
+        className="cursor-pointer p-2 border-b hover:bg-blue-200 text-sm"
+      >
+        {file.path}
+      </div>
+    ))}
+  </div>
+</div>
+
+{selectedFile && (
+  <div className="mt-6">
+    <h3 className="text-xl font-bold mb-3">
+      {selectedFile}
+    </h3>
+
+    <div
+      className={`p-4 rounded-lg max-h-96 overflow-auto ${
+        darkMode ? "bg-gray-700" : "bg-gray-100"
+      }`}
+    >
+      <pre className="whitespace-pre-wrap text-sm">
+        {fileContent}
+      </pre>
+    </div>
+  </div>
+)}
 
         {/* README Preview Section */}
         {readme && (

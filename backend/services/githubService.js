@@ -185,11 +185,33 @@ const compareRepositories = async (req, res) => {
   }
 };
 
+const getRepoTree = async (owner, repo) => {
+  const response = await axios.get(
+    `https://api.github.com/repos/${owner}/${repo}/git/trees/HEAD?recursive=1`,
+    { headers }
+  );
+
+  return response.data.tree;
+};
+
+const getFileContent = async (owner, repo, path) => {
+  const response = await axios.get(
+    `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+    { headers }
+  );
+
+  return Buffer.from(
+    response.data.content,
+    "base64"
+  ).toString("utf8");
+};
+
 module.exports = {
     getRepositoryInfo,
     saveRepository,
     compareRepositories,
     getUserProfile,
+    getFileContent,
     findRepositoryByUrl,
     getContributors,
     getIssues,
@@ -198,5 +220,6 @@ module.exports = {
     getLanguages,
     getBranches,
     getReadme,
-    getCommits
+    getCommits,
+    getRepoTree 
 };
