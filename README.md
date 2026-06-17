@@ -33,11 +33,7 @@ CodeAtlas is a full-stack GitHub repository analysis platform that allows users 
 ### External API
 
 * GitHub REST API
-
-## Screenshots
-
-*Add screenshots here.*
-
+* 
 ## Installation
 
 ### Backend
