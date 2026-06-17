@@ -435,6 +435,29 @@ const getFileContent = async (req, res) => {
   }
 };
 
+const searchFiles = async (req, res) => {
+  const { owner, repo } = req.params;
+  const { keyword } = req.query;
+
+  try {
+    const results =
+      await githubService.searchFiles(
+        owner,
+        repo,
+        keyword
+      );
+
+    res.json(results);
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to search files"
+    });
+  }
+};
+
 module.exports = {
   analyzeRepository,
   getContributors,
@@ -446,6 +469,7 @@ module.exports = {
   getLanguages,
   getReadme,
   getCommits,
+  searchFiles,
   getBranches,
   getRepoTree,
   compareRepositories

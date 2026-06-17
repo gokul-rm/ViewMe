@@ -297,7 +297,9 @@ Health Score: ${calculateHealthScore()}/100
     const response = await axios.post(
       "http://localhost:5000/api/chat/ask",
       {
-        question
+        question,
+        owner: repository.owner,
+    repo: repository.name
       }
     );
 

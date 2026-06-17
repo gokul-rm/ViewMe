@@ -206,9 +206,32 @@ const getFileContent = async (owner, repo, path) => {
   ).toString("utf8");
 };
 
+const searchFiles = async (
+  owner,
+  repo,
+  keyword
+) => {
+  const tree =
+    await getRepoTree(
+      owner,
+      repo
+    );
+
+  return tree.filter(
+    (file) =>
+      file.type === "blob" &&
+      file.path
+        .toLowerCase()
+        .includes(
+          keyword.toLowerCase()
+        )
+  );
+};
+
 module.exports = {
     getRepositoryInfo,
     saveRepository,
+    searchFiles,
     compareRepositories,
     getUserProfile,
     getFileContent,

@@ -71,4 +71,9 @@ router.get(
   githubController.getBranches
 );  
 
+router.get(
+  "/search/:owner/:repo",
+  githubController.searchFiles
+);
+
 module.exports = router;
